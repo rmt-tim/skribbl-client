@@ -1,0 +1,6 @@
+#ifndef SDLW_REVISION_INCLUDED
+#define SDLW_REVISION_INCLUDED
+
+#include <SDL_revision.h>
+
+#endif // SDLW_REVISION_INCLUDED
