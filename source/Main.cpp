@@ -2,9 +2,14 @@
 #include <sdlw/sdlw.hpp>
 #include <sdlw/image.hpp>
 #include <sdlw/ttf.hpp>
+#include <json/json.hpp>
 
 int main(int argc, char* argv[])
 try {
+	nlohmann::json j;
+	j["pi"] = 3.14;
+	std::cout << j["pi"] << std::endl;
+
 	sdl::subsystem sdl(sdl::subsystem::everything);
 	sdl::img::subsystem sdl_image(sdl::img::subsystem::png);
 	sdl::ttf::subsystem sdl_ttf;
