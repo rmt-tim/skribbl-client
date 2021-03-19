@@ -117,7 +117,7 @@ copy /Y $(SolutionDir)\third_party\SDL2_ttf-2.0.15\lib\x64\*.dll $(OutDir)</Comm
       <Message>Make DLLs available</Message>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Outputs>$(OutDir)\*.dll</Outputs>
+      <Outputs>$(OutDir)libjpeg-9.dll;$(OutDir)libpng16-16.dll;$(OutDir)libtiff-5.dll;$(OutDir)libwebp-7.dll;$(OutDir)zlib1.dll;$(OutDir)SDL2_image.dll;$(OutDir)libfreetype-6.dll;$(OutDir)SDL2_ttf.dll;$(OutDir)SDL2.dll</Outputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
