@@ -10,7 +10,7 @@
 
 using u16 = std::uint16_t;
 
-std::string wsa_error_message(const char* calling_function)
+inline std::string wsa_error_message(const char* calling_function)
 {
     DWORD error_code = WSAGetLastError();
     LPVOID message_buffer;
@@ -32,7 +32,7 @@ std::string wsa_error_message(const char* calling_function)
     return error_message;
 }
 
-void throw_wsa_error(const char* calling_function)
+inline void throw_wsa_error(const char* calling_function)
 {
     throw std::runtime_error{wsa_error_message(calling_function)};
 }
@@ -56,7 +56,7 @@ struct winsock_library {
 enum class protocol { tcp, udp };
 enum class host_type { client, server };
 
-int create_socket(const char* nodename, u16 port, protocol proto, host_type host)
+inline int create_socket(const char* nodename, u16 port, protocol proto, host_type host)
 {
     ::addrinfo hints = {};
     hints.ai_family = AF_UNSPEC;
@@ -65,7 +65,7 @@ int create_socket(const char* nodename, u16 port, protocol proto, host_type host
 
     ::addrinfo* addresses = nullptr;
     int status = ::getaddrinfo(nodename, std::to_string(port).c_str(), &hints, &addresses);
-    if (status != 0) throw std::runtime_error{::gai_strerror(status)};
+    if (status != 0) throw std::runtime_error{::gai_strerrorA(status)};
 
     int sockfd = INVALID_SOCKET;
     ::addrinfo* p = nullptr;

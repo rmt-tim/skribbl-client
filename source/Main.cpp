@@ -3,22 +3,21 @@
 #include <sdlw/image.hpp>
 #include <sdlw/ttf.hpp>
 #include <json/json.hpp>
+#include <sockets/sockets.hpp>
+
+using namespace nlohmann;
 
 int main(int argc, char* argv[])
 try {
-	nlohmann::json j;
-	j["pi"] = 3.14;
-	std::cout << j["pi"] << std::endl;
+	winsock_library winsock;
+	tcp_socket server{ "localhost", 9003 };
+	server.send("janko\n");
+	json response = json::parse(server.receive());
+	std::cout << response["tip"] << std::endl;
+	for (auto igrac : response["igraci"]) {
+		std::cout << igrac << std::endl;
+	}
 
-	sdl::subsystem sdl(sdl::subsystem::everything);
-	sdl::img::subsystem sdl_image(sdl::img::subsystem::png);
-	sdl::ttf::subsystem sdl_ttf;
-	sdl::window window("Hello, world", { 100, 100, 800, 600 }, sdl::window::shown);
-	sdl::renderer renderer(window, sdl::renderer::accelerated);
-	renderer.set_draw_color({ 100, 10, 10, 255 });
-	renderer.clear();
-	renderer.present();
-	sdl::delay(std::chrono::seconds(2));
 	return 0;
 }
 catch (const sdl::error& e) {
