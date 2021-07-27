@@ -153,7 +153,12 @@ copy /Y $(SolutionDir)\third_party\SDL2_ttf-2.0.15\lib\x64\*.dll $(OutDir)</Comm
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="source\client\Client.cpp" />
     <ClCompile Include="source\Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\rigtorp\SPSCQueue.h" />
+    <ClInclude Include="source\client\Client.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

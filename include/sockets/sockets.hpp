@@ -56,7 +56,7 @@ struct winsock_library {
 enum class protocol { tcp, udp };
 enum class host_type { client, server };
 
-inline int create_socket(const char* nodename, u16 port, protocol proto, host_type host)
+inline SOCKET create_socket(const char* nodename, u16 port, protocol proto, host_type host)
 {
     ::addrinfo hints = {};
     hints.ai_family = AF_UNSPEC;
@@ -67,7 +67,7 @@ inline int create_socket(const char* nodename, u16 port, protocol proto, host_ty
     int status = ::getaddrinfo(nodename, std::to_string(port).c_str(), &hints, &addresses);
     if (status != 0) throw std::runtime_error{::gai_strerrorA(status)};
 
-    int sockfd = INVALID_SOCKET;
+    unsigned sockfd = INVALID_SOCKET;
     ::addrinfo* p = nullptr;
     for (p = addresses; p != nullptr; p = p->ai_next) {
         sockfd = ::socket(p->ai_family, p->ai_socktype, p->ai_protocol);
@@ -112,7 +112,7 @@ inline int create_socket(const char* nodename, u16 port, protocol proto, host_ty
 }
 
 class tcp_socket {
-    int sockfd = INVALID_SOCKET;
+    SOCKET sockfd = INVALID_SOCKET;
 
 public:
     ~tcp_socket()
@@ -128,13 +128,13 @@ public:
 
     tcp_socket& operator=(tcp_socket&& other)
     {
-        ::closesocket(sockfd);
+        if (sockfd != INVALID_SOCKET) ::closesocket(sockfd);
         sockfd = other.sockfd;
         other.sockfd = INVALID_SOCKET;
         return *this;
     }
 
-    tcp_socket(int fd)
+    tcp_socket(SOCKET fd)
         : sockfd{fd}
     {}
 
@@ -169,7 +169,7 @@ public:
 };
 
 class tcp_server_socket {
-    int sockfd = INVALID_SOCKET;
+    SOCKET sockfd = INVALID_SOCKET;
 
 public:
     ~tcp_server_socket()
@@ -200,7 +200,7 @@ public:
         assert(sockfd != INVALID_SOCKET);
         ::sockaddr_storage their_addr;
         ::socklen_t addr_size = sizeof their_addr;
-        int newfd = ::accept(sockfd, (struct sockaddr*)&their_addr, &addr_size);
+        SOCKET newfd = ::accept(sockfd, (struct sockaddr*)&their_addr, &addr_size);
         if (newfd == INVALID_SOCKET) throw_wsa_error("accept");
         return tcp_socket{newfd};
     }

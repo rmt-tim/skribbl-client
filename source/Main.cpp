@@ -1,21 +1,44 @@
 #include <iostream>
+#include <thread>
+
 #include <sdlw/sdlw.hpp>
 #include <sdlw/image.hpp>
 #include <sdlw/ttf.hpp>
 #include <json/json.hpp>
-#include <sockets/sockets.hpp>
+
+#include "client/Client.h"
 
 using namespace nlohmann;
 
+void read_messages()
+try {
+	json message;
+	for (;;) {
+		if (next_message(message)) {
+			std::cout << message.dump(2) << "\n" << std::endl;
+		}
+	}
+}
+catch (const std::exception& e) {
+	std::cerr << "Error reading messages: " << e.what() << std::endl;
+}
+
 int main(int argc, char* argv[])
 try {
-	winsock_library winsock;
-	tcp_socket server{ "localhost", 9003 };
-	server.send("janko\n");
-	json response = json::parse(server.receive());
-	std::cout << response["tip"] << std::endl;
-	for (auto igrac : response["igraci"]) {
-		std::cout << igrac << std::endl;
+	start_client();
+
+	std::thread{ read_messages }.detach();
+
+	std::string line;
+	while (std::getline(std::cin, line)) {
+		json message;
+		try {
+			message = json::parse(line);
+		}
+		catch (const json::parse_error& e) {
+			std::cerr << "Invalid JSON. " << e.what() << std::endl;
+		}
+		send_message(std::move(message));
 	}
 
 	return 0;
