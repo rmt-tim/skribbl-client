@@ -44,13 +44,13 @@ void ChatPanel::drawPanels() {
 	Utils::drawRectangle(WHITE, renderer, glm::ivec4(CHAT_PANEL_START_X, CHAT_PANEL_START_Y, CHAT_PANEL_WIDTH, CHAT_PANEL_HEIGHT));
 
 	// draw border
-	Utils::drawRectangle(RED, renderer, glm::ivec4(CHAT_PANEL_START_X, CHAT_PANEL_START_Y, CHAT_PANEL_WIDTH, CHAT_PANEL_HEIGHT), false);
+	Utils::drawRectangle(BLACK, renderer, glm::ivec4(CHAT_PANEL_START_X, CHAT_PANEL_START_Y, CHAT_PANEL_WIDTH, CHAT_PANEL_HEIGHT), false);
 
 	// draw textPanel
-	Utils::drawRectangle(RED, renderer, glm::ivec4(TEXT_PANEL_START_X, TEXT_PANEL_START_Y, TEXT_PANEL_WIDTH, TEXT_PANEL_HEIGHT), false);
+	Utils::drawRectangle(BLACK, renderer, glm::ivec4(TEXT_PANEL_START_X, TEXT_PANEL_START_Y, TEXT_PANEL_WIDTH, TEXT_PANEL_HEIGHT), false);
 
 	// draw inputPanel
-	Utils::drawRectangle(RED, renderer, glm::ivec4(INPUT_PANEL_START_X, INPUT_PANEL_START_Y, INPUT_PANEL_WIDTH, INPUT_PANEL_HEIGHT), false);
+	Utils::drawRectangle(BLACK, renderer, glm::ivec4(INPUT_PANEL_START_X, INPUT_PANEL_START_Y, INPUT_PANEL_WIDTH, INPUT_PANEL_HEIGHT), false);
 }
 
 void ChatPanel::drawMessages() {

@@ -49,7 +49,7 @@ void TextPanel::draw() {
 }
 
 void TextPanel::update() {
-	if (isPressed() && !inputManager->isKeyPressed(SDL_BUTTON_LEFT)) {
+	if (isPressed() && !inputManager->isKeyPressed(SDL_BUTTON_LEFT) && !inputManager->isKeyPressed(SDLK_RETURN)) {
 		Controller::getInstance()->setUsername(textLine->getText());
 		closeWindow();
 	}
@@ -58,9 +58,8 @@ void TextPanel::update() {
 		setPressed(true);
 	}
 	else if (inputManager->isKeyPressed(SDLK_RETURN) && !textLine->empty()) {
-		Controller::getInstance()->setUsername(textLine->getText());
-		closeWindow();
-		inputManager->releaseKey(SDLK_RETURN);
+		setButtonColor(RED);
+		setPressed(true);
 	}
 
 	if (textLine != nullptr) {
