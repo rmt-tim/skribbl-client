@@ -1,5 +1,6 @@
 #pragma once
 #include "InputManager.h"
+#include "source/client/Client.h"
 #include <glm/glm.hpp>
 #include <string>
 
@@ -27,6 +28,9 @@ private:
 	glm::ivec2 indicatorPosition;
 	std::string text;
 	std::string username;
+	std::string word;
+	bool drawer;
+	bool start;
 private:
 	Controller();
 	~Controller();
@@ -60,5 +64,18 @@ public:
 	void resetText();
 	bool removeCharacter();
 	void updatePreviousMode();
+
+	// network
+	void startGame();
+	void login(std::string username);
+	
+	void setDrawer(std::string username);
+	bool isDrawer() const;
+
+	void setStart(bool start);
+	bool hasStarted() const;
+
+	void setWord(std::string word);
+	std::string getWord() const;
 };
 

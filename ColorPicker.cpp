@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <iostream>
 
-ColorPicker::ColorPicker() : window(nullptr), renderer(nullptr), visible(false), clickedRed(false), clickedGreen(false), clickedBlue(false), clickedSubmit(false), hasReset(true), redLabel("0"), greenLabel("0"), blueLabel("0") {
+ColorPicker::ColorPicker() : window(nullptr), inputManager(nullptr), renderer(nullptr), visible(false), clickedRed(false), clickedGreen(false), clickedBlue(false), clickedSubmit(false), hasReset(true), redLabel("0"), greenLabel("0"), blueLabel("0") {
 
 }
 

@@ -75,6 +75,38 @@ void Controller::updatePreviousMode() {
     this->previousMode = mode;
 }
 
+void Controller::startGame() {
+    send_message({ {"type", "startGame"} });
+}
+
+void Controller::login(std::string username) {
+    send_message({ {"type", "username"}, {"username", username} });
+}
+
+void Controller::setDrawer(std::string username) {
+    drawer = this->username == username;
+}
+
+bool Controller::isDrawer() const {
+    return drawer;
+}
+
+void Controller::setStart(bool start) {
+    this->start = start;
+}
+
+bool Controller::hasStarted() const {
+    return start;
+}
+
+void Controller::setWord(std::string word) {
+    this->word = word;
+}
+
+std::string Controller::getWord() const {
+    return word;
+}
+
 void Controller::setScreenState(ScreenState screenState) {
     this->screenState = screenState;
 }
@@ -97,6 +129,7 @@ void Controller::appendText(char* newText, int index) {
 
 void Controller::setUsername(std::string name) {
     this->username = name;
+    login(name);
 }
 
 void Controller::resetText() {

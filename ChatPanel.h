@@ -32,5 +32,6 @@ private:
 	void initTextLine();
 	void enterEvent();
 	void updateTextLine(Uint32 deltaTime);
+	bool start(std::string message);
 };
 

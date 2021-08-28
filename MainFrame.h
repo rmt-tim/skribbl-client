@@ -41,10 +41,12 @@ private:
 	glm::ivec2 end;
 	Uint32 panelTimer;
 	bool showed;
+	bool endLine;
 public:
 	MainFrame();
 	~MainFrame();
 	void callback(std::string username);
+	void openMessagePanel(std::string message);
 private:
 	void init();
 	void initSDL();
@@ -56,6 +58,7 @@ private:
 	void run();
 	void handleInputEvents();
 	void handleWindowEvents(SDL_Event& event);
+	void handleNetworkEvents();
 	void update();
 	void updateColorPicker();
 	void updateMessagePanel();
@@ -72,9 +75,11 @@ private:
 	void savePreviousState();
 	void setMode(Mode mode);
 	void paint(glm::ivec2 mouseCoords);
+	void paintScreen(glm::ivec2 mouseCoords);
 	void erase(glm::ivec2 mouseCoords);
 	void updatePanelTimer(Uint32 deltaTime);
 	void updateChatPanel();
 	bool doRefresh();
+	bool isDrawer();
 };
 

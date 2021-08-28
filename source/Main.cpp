@@ -12,25 +12,25 @@
 
 using namespace nlohmann;
 
-void read_messages()
-try {
-	json message;
-	for (;;) {
-		if (next_message(message)) {
-			std::cout << message.dump(2) << "\n" << std::endl;
-		}
-	}
-}
-catch (const std::exception& e) {
-	std::cerr << "Error reading messages: " << e.what() << std::endl;
-}
+//void read_messages()
+//try {
+//	json message;
+//	for (;;) {
+//		if (next_message(message)) {
+//			std::cout << message.dump(2) << "\n" << std::endl;
+//		}
+//	}
+//}
+//catch (const std::exception& e) {
+//	std::cerr << "Error reading messages: " << e.what() << std::endl;
+//}
 
 int main(int argc, char* argv[]) {
-	MainFrame();	
-	try {
+	//try {
 		start_client();
+		MainFrame();
 
-		std::thread{ read_messages }.detach();
+		/*std::thread{ read_messages }.detach();
 
 		std::string line;
 		while (std::getline(std::cin, line)) {
@@ -42,16 +42,16 @@ int main(int argc, char* argv[]) {
 				std::cerr << "Invalid JSON. " << e.what() << std::endl;
 			}
 			send_message(std::move(message));
-		}
+		}*/
 
 		return 0;
-	}
-	catch (const sdl::error& e) {
+	//}
+	/*catch (const sdl::error& e) {
 		std::cerr << "SDL error: " << e.what();
 		return 1;
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Uncaught exception: " << e.what();
 		return 1;
-	}
+	}*/
 }

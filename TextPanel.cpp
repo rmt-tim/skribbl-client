@@ -1,6 +1,7 @@
 #include "TextPanel.h"
 #include "Utils.h"
 #include "Config.h"
+#include "source/client/Client.h"
 #include <iostream>
 
 TextPanel::TextPanel() : Window(), font(nullptr), button(), buttonColor(YELLOW_GREEN), pressed(false), textLine(nullptr) {

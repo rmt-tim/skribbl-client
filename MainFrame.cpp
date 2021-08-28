@@ -3,9 +3,12 @@
 #include "Component.h"
 #include "Utils.h"
 #include "ImageLoader.h"
+#include "source/client/Client.h"
 #include <iostream>
 
-MainFrame::MainFrame() : gameState(GameState::PLAY), panelTimer(0), showed(false) {
+#define CONTROLLER (*Controller::getInstance())
+
+MainFrame::MainFrame() : gameState(GameState::PLAY), start(-1, -1), end(0, 0), panelTimer(0), showed(false), endLine(true) {
 	init();
 }
 
@@ -108,6 +111,7 @@ void MainFrame::run() {
 	while (gameState != GameState::EXIT) {
 		Uint32 startTime = SDL_GetTicks();
 		handleInputEvents();
+		handleNetworkEvents();
 		update();
 		drawHUD();
 		drawChatPanel();
@@ -119,7 +123,9 @@ void MainFrame::run() {
 
 		if (DESIRED_FRAME_TIME > frameTime) {
 			SDL_Delay(DESIRED_FRAME_TIME - frameTime);
-			start = inputManager->getMouseCoordinates();
+			if (isDrawer()) {
+				start = inputManager->getMouseCoordinates();
+			}
 		}
 	}
 }
@@ -190,6 +196,46 @@ void MainFrame::handleWindowEvents(SDL_Event& event) {
 	}
 }
 
+void MainFrame::handleNetworkEvents() {
+	json message;
+	while (next_message(message)) {
+		if (message["type"] == "usernameList") {
+			chatPanel.addMessage("<<Lista igraca>>");
+			for (std::string username : message["usernames"]) {
+				chatPanel.addMessage("  " + username);
+			}
+		}
+		else if (message["type"] == "gameStarted") {
+			CONTROLLER.setStart(true);
+			CONTROLLER.setWord(message["word"]);
+			CONTROLLER.setDrawer(message["drawer"]);
+
+			if (isDrawer()) {
+				openMessagePanel("Rec je: " + CONTROLLER.getWord());
+			}
+
+			chatPanel.addMessage(std::string{ message["drawer"] } +" crta.");
+		}
+		else if (message["type"] == "line") {
+			int x = message["x"];
+			int y = message["y"];
+
+			if (start.x < 0) {
+				start.x = x;
+				start.y = y;
+				return;
+			}
+
+			if (!isDrawer()) {
+				paintScreen(glm::ivec2(x, y));
+			}
+		}
+		else if (message["type"] == "endLine") {
+			start = glm::ivec2(-1, -1);
+		}
+	}
+}
+
 void MainFrame::update() {
 	glm::ivec2 mouseCoords = inputManager->getMouseCoordinates();
 
@@ -202,7 +248,16 @@ void MainFrame::update() {
 
 	// update start position
 	if (!inputManager->isKeyPressed(SDL_BUTTON_LEFT)) {
-		start = mouseCoords;
+		if (isDrawer()) {
+			start = mouseCoords;
+			if (endLine) {
+				send_message({ {"type", "endLine"} });
+				endLine = false;
+			}
+		}
+	}
+	else {
+		endLine = true
 	}
 
 	updateColorPicker();
@@ -215,8 +270,11 @@ void MainFrame::update() {
 
 	updateChatPanel();
 	updateCursorActivity(mouseCoords);
-	paint(mouseCoords);
-	erase(mouseCoords);
+
+	if (isDrawer()) {
+		paint(mouseCoords);
+		erase(mouseCoords);
+	}
 }
 
 void MainFrame::updateColorPicker() {
@@ -238,17 +296,20 @@ void MainFrame::updateColorPicker() {
 }
 
 void MainFrame::updateMessagePanel() {
-	// should open messagePanel
-	if (inputManager->isKeyPressed(SDLK_a) && !messagePanel.isVisible() && !textPanel.isVisible()) {
-		messagePanel.init("Message has arrived", &font);
-		controller->setMode(Mode::NONE);
-		updateCursor();
-	}
-	else if (messagePanel.isVisible()) {
+	if (messagePanel.isVisible()) {
 		messagePanel.update();
 		if (messagePanel.isVisible()) {
 			messagePanel.draw();
 		}
+	}
+}
+
+void MainFrame::openMessagePanel(std::string message) {
+	// should open messagePanel
+	if (!messagePanel.isVisible() && !textPanel.isVisible()) {
+		messagePanel.init(message, &font);
+		controller->setMode(Mode::NONE);
+		updateCursor();
 	}
 }
 
@@ -361,6 +422,10 @@ bool MainFrame::doRefresh() {
 	return controller->getScreenState() == ScreenState::REFRESH;
 }
 
+bool MainFrame::isDrawer() {
+	return CONTROLLER.isDrawer();
+}
+
 void MainFrame::reset() {
 	inputManager->setClickNumber(0);
 	inputManager->setTextInput(nullptr, false);
@@ -385,29 +450,35 @@ void MainFrame::paint(glm::ivec2 mouseCoords) {
 	if (inputManager->isKeyPressed(SDL_BUTTON_LEFT) && controller->isPainting() && inputManager->isMoving()) {
 		if (mouseCoords.y > MAIN_PANEL_HEIGHT) {
 			if (controller->isPainting()) {
-				int brushSize = mainPanel.getBrushSize();
-				Color color = mainPanel.getSelectedColor();
+				send_message({ {"type", "line"}, {"x", mouseCoords.x}, {"y", mouseCoords.y} });
 
-				int width = brushSize * UNIT_WIDTH / 20;
-				int height = brushSize * UNIT_WIDTH / 20;
-
-				end = mouseCoords;
-
-				std::vector<SDL_Rect> path = Utils::getLinePath(start, end, width, height);
-
-				for (size_t i = 0; i < path.size(); i++) {
-					SDL_Rect bounds = path[i];
-
-					SDL_SetRenderDrawColor(renderer, color.getR(), color.getG(), color.getB(), color.getA());
-					SDL_RenderFillRect(renderer, &bounds);
-				}
+				paintScreen(mouseCoords);
 
 				inputManager->setMoving(false);
-
-				start = end;
 			}
 		}
 	}
+}
+
+void MainFrame::paintScreen(glm::ivec2 mouseCoords) {
+	int brushSize = mainPanel.getBrushSize();
+	Color color = mainPanel.getSelectedColor();
+
+	int width = brushSize * UNIT_WIDTH / 20;
+	int height = brushSize * UNIT_WIDTH / 20;
+
+	end = mouseCoords;
+
+	std::vector<SDL_Rect> path = Utils::getLinePath(start, end, width, height);
+
+	for (size_t i = 0; i < path.size(); i++) {
+		SDL_Rect bounds = path[i];
+
+		SDL_SetRenderDrawColor(renderer, color.getR(), color.getG(), color.getB(), color.getA());
+		SDL_RenderFillRect(renderer, &bounds);
+	}
+
+	start = end;
 }
 
 void MainFrame::erase(glm::ivec2 mouseCoords) {

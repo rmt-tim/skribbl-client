@@ -3,6 +3,7 @@
 #include "Color.h"
 #include "Controller.h"
 #include "Utils.h"
+#include "source/client/Client.h"
 #include <iostream>
 
 ChatPanel::ChatPanel() : GUIBase(), offsetY(0), textLine(nullptr), font(nullptr), renderer(nullptr) {
@@ -58,11 +59,10 @@ void ChatPanel::drawMessages() {
 	}
 
 	std::queue<std::string> temp = messages;
-	std::string username = Controller::getInstance()->getUsername();
 	int i = 0;
 
 	while (!temp.empty()) {
-		std::string text = username + ": " + temp.front();
+		std::string text = temp.front();
 
 		SDL_Texture* texture = nullptr;
 		SDL_Rect bounds;
@@ -89,7 +89,15 @@ void ChatPanel::initTextLine() {
 
 void ChatPanel::enterEvent() {
 	if (textLine->isEnabled() && inputManager->isKeyPressed(SDLK_RETURN)) {
-		addMessage(textLine->getText());
+		std::string message = textLine->getText();
+
+		if (start(message)) {
+			Controller::getInstance()->startGame();
+		}
+		else {
+			addMessage(Controller::getInstance()->getUsername() + ": " + message);
+		}
+
 		textLine->clear();
 		inputManager->releaseKey(SDLK_RETURN);
 	}
@@ -112,6 +120,10 @@ void ChatPanel::updateTextLine(Uint32 deltaTime) {
 		textLine->setEnable(false);
 		textLine->setVisibleCursor(false);
 	}
+}
+
+bool ChatPanel::start(std::string message) {
+	return message == "/start";
 }
 
 void ChatPanel::setRenderer(SDL_Renderer* renderer) {
