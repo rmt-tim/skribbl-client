@@ -524,20 +524,14 @@ void MainFrame::paintScreen(glm::ivec2 mouseCoords, int brushSize, Color color) 
 
 void MainFrame::erase(glm::ivec2 mouseCoords) {
 	if (inputManager->isKeyPressed(SDL_BUTTON_LEFT) && controller->isEraseing() && inputManager->isMoving()) {
-		end = mouseCoords;
+		Color c = WHITE;
+		int brushSize = mainPanel.getBrushSize();
 
-		std::vector<SDL_Rect> path = Utils::getLinePath(start, end, RUBBER_WIDTH, RUBBER_HEIGHT);
+		send_message({ {"type", "line"}, {"x", mouseCoords.x}, {"y", mouseCoords.y}, {"r", c.getR()}, {"g", c.getG()}, {"b", c.getB()}, {"a", c.getA()}, {"brushSize", brushSize} });
 
-		for (size_t i = 0; i < path.size(); i++) {
-			SDL_Rect bounds = path[i];
+		paintScreen(mouseCoords, brushSize, c);
 
-			SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-			SDL_RenderFillRect(renderer, &bounds);
-		}
-
-		start = end;
-
-		return;
+		inputManager->setMoving(false);
 	}
 }
 
