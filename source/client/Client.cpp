@@ -7,7 +7,7 @@
 #include <rigtorp/SPSCQueue.h>
 #include <sockets/sockets.hpp>
 
-static constexpr const char* server_name = "localhost";
+static constexpr const char* server_name = "ec2-13-58-58-208.us-east-2.compute.amazonaws.com";
 static constexpr short server_port = 9004;
 
 static tcp_socket server{ INVALID_SOCKET };
