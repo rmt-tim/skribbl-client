@@ -71,11 +71,13 @@ private:
 	void updateCursor();
 	void updateScreen();
 	void reset();
+	void resetGame();
+	void clearScreen();
 	void returnToPreviousState();
 	void savePreviousState();
 	void setMode(Mode mode);
 	void paint(glm::ivec2 mouseCoords);
-	void paintScreen(glm::ivec2 mouseCoords);
+	void paintScreen(glm::ivec2 mouseCoords, int brushSize, Color color);
 	void erase(glm::ivec2 mouseCoords);
 	void updatePanelTimer(Uint32 deltaTime);
 	void updateChatPanel();

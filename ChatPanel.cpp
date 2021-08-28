@@ -94,8 +94,8 @@ void ChatPanel::enterEvent() {
 		if (start(message)) {
 			Controller::getInstance()->startGame();
 		}
-		else {
-			addMessage(Controller::getInstance()->getUsername() + ": " + message);
+		else if(Controller::getInstance()->hasStarted() && !Controller::getInstance()->isDrawer()) {
+			Controller::getInstance()->sendMessage(message);
 		}
 
 		textLine->clear();
@@ -104,7 +104,7 @@ void ChatPanel::enterEvent() {
 }
 
 void ChatPanel::updateTextLine(Uint32 deltaTime) {
-	if (textLine == nullptr) {
+	if (textLine == nullptr || Controller::getInstance()->isDrawer()) {
 		return;
 	}
 

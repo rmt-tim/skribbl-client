@@ -77,5 +77,7 @@ public:
 
 	void setWord(std::string word);
 	std::string getWord() const;
+
+	void sendMessage(std::string text);
 };
 

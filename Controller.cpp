@@ -107,6 +107,10 @@ std::string Controller::getWord() const {
     return word;
 }
 
+void Controller::sendMessage(std::string text) {
+    send_message({ {"type", "guess"}, {"word", text} });
+}
+
 void Controller::setScreenState(ScreenState screenState) {
     this->screenState = screenState;
 }

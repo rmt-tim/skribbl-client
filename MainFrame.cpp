@@ -220,6 +220,9 @@ void MainFrame::handleNetworkEvents() {
 			int x = message["x"];
 			int y = message["y"];
 
+			Color color(message["r"], message["g"], message["b"], message["a"]);
+			int brushSize = message["brushSize"];
+
 			if (start.x < 0) {
 				start.x = x;
 				start.y = y;
@@ -227,11 +230,38 @@ void MainFrame::handleNetworkEvents() {
 			}
 
 			if (!isDrawer()) {
-				paintScreen(glm::ivec2(x, y));
+				paintScreen(glm::ivec2(x, y), brushSize, color);
 			}
 		}
 		else if (message["type"] == "endLine") {
 			start = glm::ivec2(-1, -1);
+		}
+		else if (message["type"] == "correctGuess") {
+			std::string username = message["username"];
+			std::string word = message["word"];
+				
+			std::string message = username + ": " + word;
+
+			chatPanel.addMessage(message);
+			chatPanel.addMessage(username + " guessed correctly!");
+
+			resetGame();
+		}
+		else if (message["type"] == "incorrectGuess") {
+			std::string username = message["username"];
+			std::string word = message["word"];
+
+			std::string message = username + ": " + word;
+
+			chatPanel.addMessage(message);
+		}
+		else if (message["type"] == "gameAborted") {
+			chatPanel.addMessage("Game aborted!");
+			chatPanel.addMessage("<<Lista igraca>>");
+			for (std::string username : message["usernames"]) {
+				chatPanel.addMessage("  " + username);
+			}
+			resetGame();
 		}
 	}
 }
@@ -257,7 +287,7 @@ void MainFrame::update() {
 		}
 	}
 	else {
-		endLine = true
+		endLine = true;
 	}
 
 	updateColorPicker();
@@ -267,7 +297,7 @@ void MainFrame::update() {
 	if (textPanel.isVisible() || messagePanel.isVisible() || colorPicker.isVisible()) {
 		return;
 	}
-
+	
 	updateChatPanel();
 	updateCursorActivity(mouseCoords);
 
@@ -431,6 +461,17 @@ void MainFrame::reset() {
 	inputManager->setTextInput(nullptr, false);
 }
 
+void MainFrame::resetGame() {
+	CONTROLLER.setStart(false);
+	CONTROLLER.setDrawer("");
+	start = { -1, -1 };
+	clearScreen();
+}
+
+void MainFrame::clearScreen() {
+	Utils::drawRectangle(WHITE, renderer, glm::ivec4(0, MAIN_PANEL_HEIGHT, SCREEN_WIDTH - CHAT_PANEL_WIDTH, SCREEN_HEIGHT - MAIN_PANEL_HEIGHT));
+}
+
 void MainFrame::returnToPreviousState() {
 	setMode(controller->getPreviousActionState());
 	updateCursor();
@@ -450,9 +491,12 @@ void MainFrame::paint(glm::ivec2 mouseCoords) {
 	if (inputManager->isKeyPressed(SDL_BUTTON_LEFT) && controller->isPainting() && inputManager->isMoving()) {
 		if (mouseCoords.y > MAIN_PANEL_HEIGHT) {
 			if (controller->isPainting()) {
-				send_message({ {"type", "line"}, {"x", mouseCoords.x}, {"y", mouseCoords.y} });
+				Color c = mainPanel.getSelectedColor();
+				int brushSize = mainPanel.getBrushSize();
 
-				paintScreen(mouseCoords);
+				send_message({ {"type", "line"}, {"x", mouseCoords.x}, {"y", mouseCoords.y}, {"r", c.getR()}, {"g", c.getG()}, {"b", c.getB()}, {"a", c.getA()}, {"brushSize", brushSize} });
+
+				paintScreen(mouseCoords, brushSize, c);
 
 				inputManager->setMoving(false);
 			}
@@ -460,10 +504,7 @@ void MainFrame::paint(glm::ivec2 mouseCoords) {
 	}
 }
 
-void MainFrame::paintScreen(glm::ivec2 mouseCoords) {
-	int brushSize = mainPanel.getBrushSize();
-	Color color = mainPanel.getSelectedColor();
-
+void MainFrame::paintScreen(glm::ivec2 mouseCoords, int brushSize, Color color) {
 	int width = brushSize * UNIT_WIDTH / 20;
 	int height = brushSize * UNIT_WIDTH / 20;
 
@@ -505,7 +546,7 @@ void MainFrame::updatePanelTimer(Uint32 deltaTime) {
 		return;
 	}
 	panelTimer += deltaTime;
-	if (panelTimer >= 2000) {
+	if (panelTimer >= 500) {
 		textPanel.init(&font);
 		controller->setMode(Mode::NONE);
 		updateCursor();
