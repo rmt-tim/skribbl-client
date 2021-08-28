@@ -82,7 +82,7 @@ void ChatPanel::drawMessages() {
 
 void ChatPanel::initTextLine() {
 	if (textLine == nullptr) {
-		textLine = new TextLine(glm::ivec2(INPUT_PANEL_START_X + 2, INPUT_PANEL_START_Y + ((INPUT_PANEL_HEIGHT - font->getTextHeight()) / 2)), 10, renderer, font);
+		textLine = new TextLine(glm::ivec2(INPUT_PANEL_START_X + 2, INPUT_PANEL_START_Y + ((INPUT_PANEL_HEIGHT - font->getTextHeight()) / 2)), 15, renderer, font);
 		textLine->setEnable(false);
 	}
 }

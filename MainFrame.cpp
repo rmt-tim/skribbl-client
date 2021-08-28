@@ -199,10 +199,18 @@ void MainFrame::handleWindowEvents(SDL_Event& event) {
 void MainFrame::handleNetworkEvents() {
 	json message;
 	while (next_message(message)) {
-		if (message["type"] == "usernameList") {
-			chatPanel.addMessage("<<Lista igraca>>");
+		if (message["type"] == "usernameList") { 
+			if (CONTROLLER.isFirstUsername()) {
+				chatPanel.addMessage("<<Lista igraca>>");
+			}
+			else if (message["usernames"].size() < CONTROLLER.size()) {
+				CONTROLLER.clear();
+				chatPanel.addMessage("<<Lista igraca>>");
+			}
 			for (std::string username : message["usernames"]) {
-				chatPanel.addMessage("  " + username);
+				if (CONTROLLER.addUsername(username)) {
+					chatPanel.addMessage("  " + username);
+				}
 			}
 		}
 		else if (message["type"] == "gameStarted") {
@@ -256,9 +264,11 @@ void MainFrame::handleNetworkEvents() {
 			chatPanel.addMessage(message);
 		}
 		else if (message["type"] == "gameAborted") {
+			CONTROLLER.clear();
 			chatPanel.addMessage("Game aborted!");
 			chatPanel.addMessage("<<Lista igraca>>");
 			for (std::string username : message["usernames"]) {
+				CONTROLLER.addUsername(username);
 				chatPanel.addMessage("  " + username);
 			}
 			resetGame();

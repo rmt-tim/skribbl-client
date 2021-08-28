@@ -111,6 +111,37 @@ void Controller::sendMessage(std::string text) {
     send_message({ {"type", "guess"}, {"word", text} });
 }
 
+void Controller::clear() {
+    usernames.clear();
+}
+
+int Controller::size() const {
+    return usernames.size();
+}
+
+bool Controller::addUsername(std::string username) {
+    if (contains(username)) {
+        return false;
+    }
+    else {
+        usernames.push_back(username);
+        return true;
+    }
+}
+
+bool Controller::contains(std::string username) {
+    for (std::string name : usernames) {
+        if (name == username) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Controller::isFirstUsername() const {
+    return usernames.empty();
+}
+
 void Controller::setScreenState(ScreenState screenState) {
     this->screenState = screenState;
 }

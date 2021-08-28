@@ -3,6 +3,7 @@
 #include "source/client/Client.h"
 #include <glm/glm.hpp>
 #include <string>
+#include <vector>
 
 enum class Mode {
 	NONE,
@@ -29,6 +30,7 @@ private:
 	std::string text;
 	std::string username;
 	std::string word;
+	std::vector <std::string> usernames;
 	bool drawer;
 	bool start;
 private:
@@ -79,5 +81,10 @@ public:
 	std::string getWord() const;
 
 	void sendMessage(std::string text);
+	void clear();
+	int size() const;
+	bool addUsername(std::string username);
+	bool contains(std::string username);
+	bool isFirstUsername() const;
 };
 
