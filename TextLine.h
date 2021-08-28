@@ -29,6 +29,7 @@ public:
 	void setEnable(bool state);
 	void setVisibleCursor(bool visible);
 	bool isEnabled();
+	bool empty();
 	int getSize();
 	std::string getText();
 private:

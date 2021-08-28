@@ -35,6 +35,10 @@ bool TextLine::isEnabled() {
 	return enable;
 }
 
+bool TextLine::empty() {
+	return getSize() == 0;
+}
+
 int TextLine::getSize() {
 	return text.size();
 }

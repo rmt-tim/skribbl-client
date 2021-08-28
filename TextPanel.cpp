@@ -22,7 +22,7 @@ void TextPanel::initComponents() {
 	button = { 150, 200, 200, 50 };
 
 	if (textLine == nullptr) {
-		textLine = new TextLine(glm::ivec2(TEXTING_PANEL_WIDTH / 2 - 75, TEXTING_PANEL_HEIGHT / 2 - font->getTextHeight()), 7, renderer, font);
+		textLine = new TextLine(glm::ivec2(TEXTING_PANEL_WIDTH / 2 - 74, TEXTING_PANEL_HEIGHT / 2 - font->getTextHeight()), 7, renderer, font);
 	}
 }
 
@@ -32,7 +32,7 @@ void TextPanel::draw() {
 	SDL_RenderFillRect(renderer, NULL);
 
 	// draw text background
-	Utils::drawRectangle(CITRON, renderer, glm::ivec4(TEXTING_PANEL_WIDTH / 2 - 75, TEXTING_PANEL_HEIGHT / 2 - font->getTextHeight(), 150, font->getTextHeight()));
+	Utils::drawRectangle(BLACK, renderer, glm::ivec4(TEXTING_PANEL_WIDTH / 2 - 75, TEXTING_PANEL_HEIGHT / 2 - font->getTextHeight(), 150, font->getTextHeight()), false);
 
 	// draw submit button
 	Utils::drawButton(buttonColor, "Submit", BLACK, renderer, font, button);
@@ -53,9 +53,14 @@ void TextPanel::update() {
 		Controller::getInstance()->setUsername(textLine->getText());
 		closeWindow();
 	}
-	else if (inputManager->isKeyPressed(SDL_BUTTON_LEFT) && Utils::isPointInsideBounds(inputManager->getMouseCoordinates(), button)) {
+	else if (inputManager->isKeyPressed(SDL_BUTTON_LEFT) && Utils::isPointInsideBounds(inputManager->getMouseCoordinates(), button) && !textLine->empty()) {
 		setButtonColor(RED);
 		setPressed(true);
+	}
+	else if (inputManager->isKeyPressed(SDLK_RETURN) && !textLine->empty()) {
+		Controller::getInstance()->setUsername(textLine->getText());
+		closeWindow();
+		inputManager->releaseKey(SDLK_RETURN);
 	}
 
 	if (textLine != nullptr) {
